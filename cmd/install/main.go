@@ -14,7 +14,8 @@ import (
 const (
 	tailwindBaseURL = "https://github.com/tailwindlabs/tailwindcss/releases/latest/download"
 	daisyUIBaseURL  = "https://github.com/saadeghi/daisyui/releases/latest/download"
-	datastarURL     = "https://cdn.jsdelivr.net/gh/starfederation/datastar@latest/bundles/datastar.js"
+	datastarVersion = "1.0.0-RC.7"
+	datastarURL     = "https://cdn.jsdelivr.net/gh/starfederation/datastar@" + datastarVersion + "/bundles/datastar.js"
 )
 
 func main() {
@@ -122,14 +123,14 @@ func downloadDaisyUI(cssDir string) {
 }
 
 func downloadDatastar(jsDir string) {
-	fmt.Println("  📦 Downloading Datastar (latest)...")
+	fmt.Println("  📦 Downloading Datastar v" + datastarVersion + "...")
 
 	destPath := filepath.Join(jsDir, "datastar.js")
 	if err := downloadFile(datastarURL, destPath); err != nil {
 		fatal("Failed to download Datastar: %v", err)
 	}
 
-	fmt.Println("  ✅ Datastar downloaded")
+	fmt.Println("  ✅ Datastar v" + datastarVersion + " downloaded")
 }
 
 func createInputCSS(cssDir string) {

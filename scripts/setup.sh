@@ -22,7 +22,8 @@ JS_DIR="$STATIC_DIR/js"
 
 TAILWIND_BASE_URL="https://github.com/tailwindlabs/tailwindcss/releases/latest/download"
 DAISYUI_BASE_URL="https://github.com/saadeghi/daisyui/releases/latest/download"
-DATASTAR_URL="https://cdn.jsdelivr.net/gh/starfederation/datastar@latest/bundles/datastar.js"
+DATASTAR_VERSION="1.0.0-RC.7"
+DATASTAR_URL="https://cdn.jsdelivr.net/gh/starfederation/datastar@${DATASTAR_VERSION}/bundles/datastar.js"
 
 INPUT_CSS_CONTENT='@import "tailwindcss";
 
@@ -109,10 +110,10 @@ main() {
     curl -fsSLo "$CSS_DIR/daisyui-theme.mjs" "$DAISYUI_BASE_URL/daisyui-theme.mjs"
     echo "  ✅ DaisyUI downloaded"
 
-    # Download Datastar (latest)
-    echo "  📦 Downloading Datastar (latest)..."
+    # Download Datastar
+    echo "  📦 Downloading Datastar v${DATASTAR_VERSION}..."
     curl -fsSLo "$JS_DIR/datastar.js" "$DATASTAR_URL"
-    echo "  ✅ Datastar downloaded"
+    echo "  ✅ Datastar v${DATASTAR_VERSION} downloaded"
 
     # Create input.css
     echo "$INPUT_CSS_CONTENT" > "$CSS_DIR/input.css"
