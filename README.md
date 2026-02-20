@@ -11,47 +11,47 @@ A modern, server-rendered Go web application template featuring:
 - **Tailwind CSS 4** (standalone binary, no Node.js required)
 - **Background job hub** for long-running tasks with SSE progress updates
 
-## Creating a New Project
+## Create a New Project
 
-### Option 1: Use the new-project script (Recommended)
+### One-liner (Recommended)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/ankit-lilly/go-datastar-daisyui-template/main/scripts/create.sh | bash
+```
+
+You'll be prompted for:
+1. **Project directory** - Where to create the project (default: `./my-app`)
+2. **Go module name** - Your module path (default: `github.com/<your-username>/<project-name>`)
+
+The script will automatically:
+- Download the template
+- Update module name and import paths
+- Initialize git
+- Install dependencies (Tailwind, DaisyUI, Datastar)
+- Generate templ files and build CSS
+
+### Non-interactive
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/ankit-lilly/go-datastar-daisyui-template/main/scripts/create.sh | bash -s -- ./my-app github.com/myuser/my-app
+```
+
+### Manual Setup
+
+If you prefer to set things up manually:
 
 ```bash
 # Clone the template
-git clone https://github.com/ankit-lilly/go-datastar-daisyui-template
-
-# Run the new-project script
-./go-datastar-daisyui-template/scripts/new-project.sh ~/projects/my-app github.com/myuser/my-app
-
-# Start developing
-cd ~/projects/my-app
-make run
-```
-
-The script will:
-- Copy the template to your new project directory
-- Update the Go module name and all import paths
-- Initialize a fresh git repository
-- Download all dependencies (Tailwind, DaisyUI, Datastar)
-- Generate templ files and build CSS
-
-### Option 2: Manual setup
-
-```bash
-# 1. Clone the template
 git clone https://github.com/ankit-lilly/go-datastar-daisyui-template my-app
 cd my-app
 
-# 2. Remove template git history
+# Remove template git history
 rm -rf .git && git init
 
-# 3. Update module name in go.mod
-#    Change: module github.com/ankit-lilly/go-datastar-daisyui-template
-#    To:     module github.com/myuser/my-app
+# Update module name in go.mod and all import paths
+# (find/replace github.com/ankit-lilly/go-datastar-daisyui-template with your module)
 
-# 4. Update import paths in all .go and .templ files
-#    Replace the old module path with your new one
-
-# 5. Install dependencies and run
+# Install dependencies and run
 make install
 make run
 ```
@@ -96,8 +96,9 @@ make run       # Build and run the server
 │   └── js/
 │       └── datastar.js       # Datastar library (downloaded)
 ├── scripts/
+│   ├── create.sh             # curl-able project creator
 │   ├── setup.sh              # Setup script (bash version)
-│   └── new-project.sh        # Create new project from template
+│   └── new-project.sh        # Create new project (local use)
 ├── Makefile
 ├── go.mod                    # Includes templ as a tool dependency
 └── README.md

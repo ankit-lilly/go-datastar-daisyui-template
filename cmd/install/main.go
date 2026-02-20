@@ -164,11 +164,8 @@ func generateTempl() {
 func buildCSS(cssDir string) {
 	fmt.Println("  🔨 Building CSS...")
 
-	tailwindPath := filepath.Join(cssDir, "tailwindcss")
-	inputPath := filepath.Join(cssDir, "input.css")
-	outputPath := filepath.Join(cssDir, "output.css")
-
-	cmd := exec.Command(tailwindPath, "-i", inputPath, "-o", outputPath, "--minify")
+	// Run from cssDir, so use relative paths
+	cmd := exec.Command("./tailwindcss", "-i", "input.css", "-o", "output.css", "--minify")
 	cmd.Dir = cssDir
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
