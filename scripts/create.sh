@@ -245,6 +245,10 @@ main() {
     cd "$project_dir"
     git init -q
 
+    # Generate templ files first (needed before go mod tidy)
+    print_step "Generating templ files..."
+    go run github.com/a-h/templ/cmd/templ@latest generate
+
     # Download dependencies
     print_step "Downloading Go dependencies..."
     go mod tidy
