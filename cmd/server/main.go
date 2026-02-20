@@ -38,12 +38,10 @@ func main() {
 
 	// Pages
 	mux.HandleFunc("GET /", h.Index)
-	mux.HandleFunc("GET /demo", h.Demo)
 
 	// API - SSE endpoints
 	mux.HandleFunc("GET /api/counter", h.Counter)
 	mux.HandleFunc("POST /api/increment", h.Increment)
-	mux.HandleFunc("GET /api/job/{id}", h.JobStatus)
 	mux.HandleFunc("POST /api/job/start", h.StartJob)
 
 	// Create server

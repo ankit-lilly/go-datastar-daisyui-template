@@ -2,12 +2,17 @@ package views
 
 import "fmt"
 
-// DemoPage renders the interactive demo page
-templ DemoPage() {
-	@Base("Demo - Go + Datastar + DaisyUI") {
-		@Navbar("demo")
+// IndexPage renders the home page (demo page)
+templ IndexPage() {
+	@Base("Go + Templ + Datastar + DaisyUI") {
+		@Navbar()
 		<div class="container mx-auto p-4 max-w-4xl">
-			<h1 class="text-3xl font-bold mb-8">Interactive Demo</h1>
+			<div class="text-center mb-8">
+				<h1 class="text-4xl font-bold mb-4">Go + Templ + Datastar + DaisyUI</h1>
+				<p class="text-lg opacity-70">
+					A modern, server-rendered Go application with reactive frontend
+				</p>
+			</div>
 			@CounterSection()
 			@FormBindingSection()
 			@BackgroundJobSection()
@@ -24,7 +29,7 @@ templ CounterSection() {
 		<div class="card-body">
 			<h2 class="card-title">Counter with SSE</h2>
 			<p class="text-sm mb-4">Click to increment the counter. Updates are pushed via Server-Sent Events.</p>
-			<div class="flex items-center gap-4" data-on:load="@get('/api/counter')">
+			<div class="flex items-center gap-4" data-init="@get('/api/counter')">
 				<button
 					class="btn btn-primary"
 					data-on:click="@post('/api/increment')"
@@ -90,7 +95,7 @@ templ BackgroundJobSection() {
 		<div class="card-body">
 			<h2 class="card-title">Background Job with Progress</h2>
 			<p class="text-sm mb-4">Start a long-running background job and watch its progress via SSE.</p>
-			<div data-signals="{jobId: '', jobStatus: ''}">
+			<div data-signals="{jobId: '', jobStatus: '', jobProgress: 0}">
 				<button
 					class="btn btn-secondary mb-4"
 					data-on:click="@post('/api/job/start')"
@@ -100,12 +105,9 @@ templ BackgroundJobSection() {
 					<span data-show="$jobStatus == 'running'" class="loading loading-spinner"></span>
 				</button>
 				<div id="job-info"></div>
-				<div
-					id="job-progress"
-					data-show="$jobId && $jobStatus == 'running'"
-					data-on:load="$jobId && @get(`/api/job/${$jobId}`)"
-				>
-					<progress class="progress progress-primary w-full" value="0" max="100"></progress>
+				<div id="job-progress" data-show="$jobId">
+					<progress class="progress progress-primary w-full" data-attr:value="$jobProgress" max="100"></progress>
+					<span class="text-sm" data-text="$jobProgress + '%'"></span>
 				</div>
 			</div>
 		</div>
@@ -116,14 +118,6 @@ templ BackgroundJobSection() {
 templ JobInfo(jobID string, alertClass string, message string) {
 	<div id="job-info" class={ "alert " + alertClass }>
 		<span>{ message }</span>
-	</div>
-}
-
-// JobProgress renders job progress bar (for SSE updates)
-templ JobProgress(progress int) {
-	<div id="job-progress">
-		<progress class="progress progress-primary w-full" value={ fmt.Sprintf("%d", progress) } max="100"></progress>
-		<span class="text-sm">{ fmt.Sprintf("%d", progress) }%</span>
 	</div>
 }
 

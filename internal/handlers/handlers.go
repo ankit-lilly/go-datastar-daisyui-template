@@ -4,10 +4,10 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io"
 	"log/slog"
 	"net/http"
 	"sync/atomic"
+	"time"
 
 	"github.com/a-h/templ"
 	"github.com/ankit-lilly/go-datastar-daisyui-template/internal/jobs"
@@ -41,14 +41,6 @@ func (h *Handlers) Index(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Demo serves the demo page
-func (h *Handlers) Demo(w http.ResponseWriter, r *http.Request) {
-	if err := views.DemoPage().Render(r.Context(), w); err != nil {
-		h.logger.Error("template render error", "error", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-	}
-}
-
 // Counter handles SSE streaming for counter updates
 func (h *Handlers) Counter(w http.ResponseWriter, r *http.Request) {
 	sse := datastar.NewSSE(w, r)
@@ -68,7 +60,7 @@ func (h *Handlers) Increment(w http.ResponseWriter, r *http.Request) {
 	sse.PatchElements(html)
 }
 
-// StartJob starts a background job and returns its ID
+// StartJob starts a background job and streams progress
 func (h *Handlers) StartJob(w http.ResponseWriter, r *http.Request) {
 	sse := datastar.NewSSE(w, r)
 
@@ -81,14 +73,7 @@ func (h *Handlers) StartJob(w http.ResponseWriter, r *http.Request) {
 				return j.Context().Err()
 			default:
 				j.SetProgress(i)
-				// Simulate work
-				select {
-				case <-j.Context().Done():
-					return j.Context().Err()
-				case <-r.Context().Done():
-					return r.Context().Err()
-				default:
-				}
+				time.Sleep(500 * time.Millisecond)
 			}
 		}
 		return nil
@@ -97,45 +82,27 @@ func (h *Handlers) StartJob(w http.ResponseWriter, r *http.Request) {
 	// Submit job to hub
 	h.jobHub.Submit(job)
 
-	// Return job ID to client
-	sse.PatchSignals([]byte(fmt.Sprintf(`{"jobId": "%s", "jobStatus": "running"}`, job.ID)))
-	html := renderComponent(r.Context(), views.JobInfo(job.ID, "alert-info", "Job started: "+job.ID))
+	// Send initial state
+	sse.PatchSignals([]byte(fmt.Sprintf(`{"jobId": "%s", "jobStatus": "running", "jobProgress": 0}`, job.ID)))
+	html := renderComponent(r.Context(), views.JobInfo(job.ID, "alert-info", "Job started"))
 	sse.PatchElements(html)
-}
-
-// JobStatus streams job progress via SSE
-func (h *Handlers) JobStatus(w http.ResponseWriter, r *http.Request) {
-	jobID := r.PathValue("id")
-	if jobID == "" {
-		http.Error(w, "job id required", http.StatusBadRequest)
-		return
-	}
-
-	job, ok := h.jobHub.Get(jobID)
-	if !ok {
-		http.Error(w, "job not found", http.StatusNotFound)
-		return
-	}
-
-	sse := datastar.NewSSE(w, r)
 
 	// Stream job progress
 	for update := range job.Updates() {
-		html := renderComponent(r.Context(), views.JobProgress(update.Progress))
-		sse.PatchElements(html)
+		sse.PatchSignals([]byte(fmt.Sprintf(`{"jobProgress": %d}`, update.Progress)))
 
 		if update.Done {
 			status := "completed"
 			alertClass := "alert-success"
-			message := "Job completed"
+			message := "Job completed!"
 			if update.Error != nil {
 				status = "failed"
 				alertClass = "alert-error"
 				message = "Job failed: " + update.Error.Error()
 			}
-			infoHTML := renderComponent(r.Context(), views.JobInfo(jobID, alertClass, message))
+			infoHTML := renderComponent(r.Context(), views.JobInfo(job.ID, alertClass, message))
 			sse.PatchElements(infoHTML)
-			sse.PatchSignals([]byte(`{"jobStatus": "` + status + `"}`))
+			sse.PatchSignals([]byte(fmt.Sprintf(`{"jobStatus": "%s"}`, status)))
 			break
 		}
 	}
@@ -149,20 +116,3 @@ func renderComponent(ctx context.Context, component templ.Component) string {
 	}
 	return buf.String()
 }
-
-// Unused - keeping for reference
-func (h *Handlers) renderCounter(count int64) string {
-	return fmt.Sprintf(`<span id="counter-value">%d</span>`, count)
-}
-
-func (h *Handlers) renderProgress(progress int) string {
-	return fmt.Sprintf(`
-		<div id="job-progress">
-			<progress class="progress progress-primary w-full" value="%d" max="100"></progress>
-			<span class="text-sm">%d%%</span>
-		</div>
-	`, progress, progress)
-}
-
-// Ensure io.Writer is imported (for templ.Component interface)
-var _ io.Writer = (*bytes.Buffer)(nil)

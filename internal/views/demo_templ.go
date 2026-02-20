@@ -10,8 +10,8 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import "fmt"
 
-// DemoPage renders the interactive demo page
-func DemoPage() templ.Component {
+// IndexPage renders the home page (demo page)
+func IndexPage() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -44,11 +44,11 @@ func DemoPage() templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = Navbar("demo").Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = Navbar().Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, " <div class=\"container mx-auto p-4 max-w-4xl\"><h1 class=\"text-3xl font-bold mb-8\">Interactive Demo</h1>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, " <div class=\"container mx-auto p-4 max-w-4xl\"><div class=\"text-center mb-8\"><h1 class=\"text-4xl font-bold mb-4\">Go + Templ + Datastar + DaisyUI</h1><p class=\"text-lg opacity-70\">A modern, server-rendered Go application with reactive frontend</p></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -82,7 +82,7 @@ func DemoPage() templ.Component {
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = Base("Demo - Go + Datastar + DaisyUI").Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Base("Go + Templ + Datastar + DaisyUI").Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -112,7 +112,7 @@ func CounterSection() templ.Component {
 			templ_7745c5c3_Var3 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div class=\"card bg-base-200 mb-6\"><div class=\"card-body\"><h2 class=\"card-title\">Counter with SSE</h2><p class=\"text-sm mb-4\">Click to increment the counter. Updates are pushed via Server-Sent Events.</p><div class=\"flex items-center gap-4\" data-on:load=\"@get('/api/counter')\"><button class=\"btn btn-primary\" data-on:click=\"@post('/api/increment')\">Increment</button><div class=\"text-2xl font-mono\">Count: <span id=\"counter-value\">0</span></div></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div class=\"card bg-base-200 mb-6\"><div class=\"card-body\"><h2 class=\"card-title\">Counter with SSE</h2><p class=\"text-sm mb-4\">Click to increment the counter. Updates are pushed via Server-Sent Events.</p><div class=\"flex items-center gap-4\" data-init=\"@get('/api/counter')\"><button class=\"btn btn-primary\" data-on:click=\"@post('/api/increment')\">Increment</button><div class=\"text-2xl font-mono\">Count: <span id=\"counter-value\">0</span></div></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -149,7 +149,7 @@ func CounterValue(count int64) templ.Component {
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", count))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/demo.templ`, Line: 44, Col: 52}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/demo.templ`, Line: 49, Col: 52}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -215,7 +215,7 @@ func BackgroundJobSection() templ.Component {
 			templ_7745c5c3_Var7 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div class=\"card bg-base-200 mb-6\"><div class=\"card-body\"><h2 class=\"card-title\">Background Job with Progress</h2><p class=\"text-sm mb-4\">Start a long-running background job and watch its progress via SSE.</p><div data-signals=\"{jobId: '', jobStatus: ''}\"><button class=\"btn btn-secondary mb-4\" data-on:click=\"@post('/api/job/start')\" data-attr:disabled=\"$jobStatus == 'running'\"><span data-show=\"$jobStatus != 'running'\">Start Background Job</span> <span data-show=\"$jobStatus == 'running'\" class=\"loading loading-spinner\"></span></button><div id=\"job-info\"></div><div id=\"job-progress\" data-show=\"$jobId && $jobStatus == 'running'\" data-on:load=\"$jobId && @get(`/api/job/${$jobId}`)\"><progress class=\"progress progress-primary w-full\" value=\"0\" max=\"100\"></progress></div></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div class=\"card bg-base-200 mb-6\"><div class=\"card-body\"><h2 class=\"card-title\">Background Job with Progress</h2><p class=\"text-sm mb-4\">Start a long-running background job and watch its progress via SSE.</p><div data-signals=\"{jobId: '', jobStatus: '', jobProgress: 0}\"><button class=\"btn btn-secondary mb-4\" data-on:click=\"@post('/api/job/start')\" data-attr:disabled=\"$jobStatus == 'running'\"><span data-show=\"$jobStatus != 'running'\">Start Background Job</span> <span data-show=\"$jobStatus == 'running'\" class=\"loading loading-spinner\"></span></button><div id=\"job-info\"></div><div id=\"job-progress\" data-show=\"$jobId\"><progress class=\"progress progress-primary w-full\" data-attr:value=\"$jobProgress\" max=\"100\"></progress> <span class=\"text-sm\" data-text=\"$jobProgress + '%'\"></span></div></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -270,69 +270,13 @@ func JobInfo(jobID string, alertClass string, message string) templ.Component {
 		var templ_7745c5c3_Var11 string
 		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(message)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/demo.templ`, Line: 118, Col: 17}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/demo.templ`, Line: 120, Col: 17}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</span></div>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		return nil
-	})
-}
-
-// JobProgress renders job progress bar (for SSE updates)
-func JobProgress(progress int) templ.Component {
-	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
-		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
-		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
-			return templ_7745c5c3_CtxErr
-		}
-		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
-		if !templ_7745c5c3_IsBuffer {
-			defer func() {
-				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
-				if templ_7745c5c3_Err == nil {
-					templ_7745c5c3_Err = templ_7745c5c3_BufErr
-				}
-			}()
-		}
-		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var12 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var12 == nil {
-			templ_7745c5c3_Var12 = templ.NopComponent
-		}
-		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<div id=\"job-progress\"><progress class=\"progress progress-primary w-full\" value=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var13 string
-		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", progress))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/demo.templ`, Line: 125, Col: 88}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\" max=\"100\"></progress> <span class=\"text-sm\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var14 string
-		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", progress))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/demo.templ`, Line: 126, Col: 53}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "%</span></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -357,12 +301,12 @@ func ThemeSwitcherSection() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var15 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var15 == nil {
-			templ_7745c5c3_Var15 = templ.NopComponent
+		templ_7745c5c3_Var12 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var12 == nil {
+			templ_7745c5c3_Var12 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<div class=\"card bg-base-200 mb-6\"><div class=\"card-body\"><h2 class=\"card-title\">Theme Switcher</h2><p class=\"text-sm mb-4\">DaisyUI supports multiple themes. Try switching!</p><div class=\"flex flex-wrap gap-2\"><input type=\"radio\" name=\"theme\" class=\"btn theme-controller\" aria-label=\"Light\" value=\"light\" checked> <input type=\"radio\" name=\"theme\" class=\"btn theme-controller\" aria-label=\"Dark\" value=\"dark\"> <input type=\"radio\" name=\"theme\" class=\"btn theme-controller\" aria-label=\"Cupcake\" value=\"cupcake\"> <input type=\"radio\" name=\"theme\" class=\"btn theme-controller\" aria-label=\"Forest\" value=\"forest\"> <input type=\"radio\" name=\"theme\" class=\"btn theme-controller\" aria-label=\"Synthwave\" value=\"synthwave\"></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<div class=\"card bg-base-200 mb-6\"><div class=\"card-body\"><h2 class=\"card-title\">Theme Switcher</h2><p class=\"text-sm mb-4\">DaisyUI supports multiple themes. Try switching!</p><div class=\"flex flex-wrap gap-2\"><input type=\"radio\" name=\"theme\" class=\"btn theme-controller\" aria-label=\"Light\" value=\"light\" checked> <input type=\"radio\" name=\"theme\" class=\"btn theme-controller\" aria-label=\"Dark\" value=\"dark\"> <input type=\"radio\" name=\"theme\" class=\"btn theme-controller\" aria-label=\"Cupcake\" value=\"cupcake\"> <input type=\"radio\" name=\"theme\" class=\"btn theme-controller\" aria-label=\"Forest\" value=\"forest\"> <input type=\"radio\" name=\"theme\" class=\"btn theme-controller\" aria-label=\"Synthwave\" value=\"synthwave\"></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -387,12 +331,12 @@ func ComponentShowcaseSection() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var16 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var16 == nil {
-			templ_7745c5c3_Var16 = templ.NopComponent
+		templ_7745c5c3_Var13 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var13 == nil {
+			templ_7745c5c3_Var13 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<div class=\"card bg-base-200 mb-6\"><div class=\"card-body\"><h2 class=\"card-title\">DaisyUI Components</h2><p class=\"text-sm mb-4\">A few examples of DaisyUI components.</p><div class=\"flex flex-wrap gap-4 mb-4\"><button class=\"btn\">Default</button> <button class=\"btn btn-primary\">Primary</button> <button class=\"btn btn-secondary\">Secondary</button> <button class=\"btn btn-accent\">Accent</button> <button class=\"btn btn-ghost\">Ghost</button> <button class=\"btn btn-outline\">Outline</button></div><div class=\"flex flex-wrap gap-2 mb-4\"><span class=\"badge\">Default</span> <span class=\"badge badge-primary\">Primary</span> <span class=\"badge badge-secondary\">Secondary</span> <span class=\"badge badge-accent\">Accent</span> <span class=\"badge badge-info\">Info</span> <span class=\"badge badge-success\">Success</span> <span class=\"badge badge-warning\">Warning</span> <span class=\"badge badge-error\">Error</span></div><div class=\"flex flex-wrap gap-2\"><div class=\"tooltip\" data-tip=\"Hello!\"><button class=\"btn\">Hover me</button></div><label class=\"swap swap-flip\"><input type=\"checkbox\"><div class=\"swap-on\">ON</div><div class=\"swap-off\">OFF</div></label> <input type=\"checkbox\" class=\"toggle toggle-primary\"> <input type=\"checkbox\" class=\"checkbox checkbox-primary\"></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<div class=\"card bg-base-200 mb-6\"><div class=\"card-body\"><h2 class=\"card-title\">DaisyUI Components</h2><p class=\"text-sm mb-4\">A few examples of DaisyUI components.</p><div class=\"flex flex-wrap gap-4 mb-4\"><button class=\"btn\">Default</button> <button class=\"btn btn-primary\">Primary</button> <button class=\"btn btn-secondary\">Secondary</button> <button class=\"btn btn-accent\">Accent</button> <button class=\"btn btn-ghost\">Ghost</button> <button class=\"btn btn-outline\">Outline</button></div><div class=\"flex flex-wrap gap-2 mb-4\"><span class=\"badge\">Default</span> <span class=\"badge badge-primary\">Primary</span> <span class=\"badge badge-secondary\">Secondary</span> <span class=\"badge badge-accent\">Accent</span> <span class=\"badge badge-info\">Info</span> <span class=\"badge badge-success\">Success</span> <span class=\"badge badge-warning\">Warning</span> <span class=\"badge badge-error\">Error</span></div><div class=\"flex flex-wrap gap-2\"><div class=\"tooltip\" data-tip=\"Hello!\"><button class=\"btn\">Hover me</button></div><label class=\"swap swap-flip\"><input type=\"checkbox\"><div class=\"swap-on\">ON</div><div class=\"swap-off\">OFF</div></label> <input type=\"checkbox\" class=\"toggle toggle-primary\"> <input type=\"checkbox\" class=\"checkbox checkbox-primary\"></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

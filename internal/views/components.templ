@@ -17,25 +17,23 @@ templ Base(title string) {
 	</html>
 }
 
-// Navbar component for consistent navigation
-templ Navbar(activePage string) {
+// Navbar component
+templ Navbar() {
 	<div class="navbar bg-base-200">
 		<div class="navbar-start">
-			<a href="/" class="btn btn-ghost text-xl">Go Template</a>
+			<a href="/" class="btn btn-ghost text-xl">Go + Datastar + DaisyUI</a>
 		</div>
 		<div class="navbar-end">
-			if activePage == "home" {
-				<a href="/demo" class="btn btn-primary btn-sm">Demo</a>
-			} else {
-				<a href="/" class="btn btn-ghost btn-sm">Home</a>
-			}
+			<a href="https://data-star.dev" target="_blank" class="btn btn-ghost btn-sm">Datastar</a>
+			<a href="https://daisyui.com" target="_blank" class="btn btn-ghost btn-sm">DaisyUI</a>
+			<a href="https://templ.guide" target="_blank" class="btn btn-ghost btn-sm">Templ</a>
 		</div>
 	</div>
 }
 
 // Footer component
 templ Footer() {
-	<footer class="footer footer-center p-4 bg-base-200">
+	<footer class="footer footer-center p-4 bg-base-200 mt-8">
 		<aside>
 			<p>Built with Go, Templ, Datastar, DaisyUI, and Tailwind CSS</p>
 		</aside>
