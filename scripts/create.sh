@@ -43,7 +43,7 @@ print_success() {
 check_requirements() {
     local missing=()
 
-    for cmd in go curl tar sed; do
+    for cmd in go curl tar sed rsync git; do
         if ! command -v "$cmd" &> /dev/null; then
             missing+=("$cmd")
         fi
@@ -51,7 +51,18 @@ check_requirements() {
 
     if [ ${#missing[@]} -ne 0 ]; then
         print_error "Missing required tools: ${missing[*]}"
-        echo "Please install them and try again."
+        echo ""
+        echo "Please install them and try again:"
+        echo ""
+        if [[ " ${missing[*]} " =~ " rsync " ]]; then
+            echo "  macOS:  brew install rsync"
+            echo "  Ubuntu: sudo apt install rsync"
+            echo "  Fedora: sudo dnf install rsync"
+        fi
+        if [[ " ${missing[*]} " =~ " go " ]]; then
+            echo "  Go:     https://go.dev/dl/"
+        fi
+        echo ""
         exit 1
     fi
 
@@ -62,6 +73,9 @@ check_requirements() {
 
     if [ "$major" -lt 1 ] || ([ "$major" -eq 1 ] && [ "$minor" -lt 24 ]); then
         print_error "Go 1.24 or higher is required (found go$go_version)"
+        echo ""
+        echo "  Download: https://go.dev/dl/"
+        echo ""
         exit 1
     fi
 }
@@ -78,7 +92,8 @@ prompt() {
         echo -ne "${BLUE}?${NC} $prompt_text: "
     fi
 
-    read -r input
+    # Read from /dev/tty to handle curl | bash
+    read -r input < /dev/tty
 
     if [ -z "$input" ]; then
         eval "$var_name='$default'"
@@ -98,7 +113,8 @@ prompt_yn() {
         echo -ne "${BLUE}?${NC} $prompt_text ${YELLOW}[y/N]${NC}: "
     fi
 
-    read -r input
+    # Read from /dev/tty to handle curl | bash
+    read -r input < /dev/tty
     input="${input:-$default}"
 
     [[ "$input" =~ ^[Yy]$ ]]
