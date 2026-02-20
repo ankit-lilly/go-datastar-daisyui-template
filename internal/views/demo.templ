@@ -1,0 +1,185 @@
+package views
+
+import "fmt"
+
+// DemoPage renders the interactive demo page
+templ DemoPage() {
+	@Base("Demo - Go + Datastar + DaisyUI") {
+		@Navbar("demo")
+		<div class="container mx-auto p-4 max-w-4xl">
+			<h1 class="text-3xl font-bold mb-8">Interactive Demo</h1>
+			@CounterSection()
+			@FormBindingSection()
+			@BackgroundJobSection()
+			@ThemeSwitcherSection()
+			@ComponentShowcaseSection()
+		</div>
+		@Footer()
+	}
+}
+
+// CounterSection shows the SSE counter example
+templ CounterSection() {
+	<div class="card bg-base-200 mb-6">
+		<div class="card-body">
+			<h2 class="card-title">Counter with SSE</h2>
+			<p class="text-sm mb-4">Click to increment the counter. Updates are pushed via Server-Sent Events.</p>
+			<div class="flex items-center gap-4" data-on:load="@get('/api/counter')">
+				<button
+					class="btn btn-primary"
+					data-on:click="@post('/api/increment')"
+				>
+					Increment
+				</button>
+				<div class="text-2xl font-mono">
+					Count: <span id="counter-value">0</span>
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+// CounterValue renders just the counter value span (for SSE updates)
+templ CounterValue(count int64) {
+	<span id="counter-value">{ fmt.Sprintf("%d", count) }</span>
+}
+
+// FormBindingSection shows reactive form binding
+templ FormBindingSection() {
+	<div class="card bg-base-200 mb-6">
+		<div class="card-body">
+			<h2 class="card-title">Reactive Form Binding</h2>
+			<p class="text-sm mb-4">Two-way data binding with Datastar signals. No server round-trip needed.</p>
+			<div data-signals="{name: '', email: ''}">
+				<div class="form-control mb-4">
+					<label class="label">
+						<span class="label-text">Name</span>
+					</label>
+					<input
+						type="text"
+						placeholder="Enter your name"
+						class="input input-primary"
+						data-bind:name
+					/>
+				</div>
+				<div class="form-control mb-4">
+					<label class="label">
+						<span class="label-text">Email</span>
+					</label>
+					<input
+						type="email"
+						placeholder="Enter your email"
+						class="input input-primary"
+						data-bind:email
+					/>
+				</div>
+				<div class="alert alert-info" data-show="$name || $email">
+					<div>
+						<span data-show="$name">Hello, <strong data-text="$name"></strong>!</span>
+						<span data-show="$email"> Your email is <strong data-text="$email"></strong>.</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+// BackgroundJobSection shows background job with progress
+templ BackgroundJobSection() {
+	<div class="card bg-base-200 mb-6">
+		<div class="card-body">
+			<h2 class="card-title">Background Job with Progress</h2>
+			<p class="text-sm mb-4">Start a long-running background job and watch its progress via SSE.</p>
+			<div data-signals="{jobId: '', jobStatus: ''}">
+				<button
+					class="btn btn-secondary mb-4"
+					data-on:click="@post('/api/job/start')"
+					data-attr:disabled="$jobStatus == 'running'"
+				>
+					<span data-show="$jobStatus != 'running'">Start Background Job</span>
+					<span data-show="$jobStatus == 'running'" class="loading loading-spinner"></span>
+				</button>
+				<div id="job-info"></div>
+				<div
+					id="job-progress"
+					data-show="$jobId && $jobStatus == 'running'"
+					data-on:load="$jobId && @get(`/api/job/${$jobId}`)"
+				>
+					<progress class="progress progress-primary w-full" value="0" max="100"></progress>
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+// JobInfo renders job info alert (for SSE updates)
+templ JobInfo(jobID string, alertClass string, message string) {
+	<div id="job-info" class={ "alert " + alertClass }>
+		<span>{ message }</span>
+	</div>
+}
+
+// JobProgress renders job progress bar (for SSE updates)
+templ JobProgress(progress int) {
+	<div id="job-progress">
+		<progress class="progress progress-primary w-full" value={ fmt.Sprintf("%d", progress) } max="100"></progress>
+		<span class="text-sm">{ fmt.Sprintf("%d", progress) }%</span>
+	</div>
+}
+
+// ThemeSwitcherSection shows DaisyUI theme switching
+templ ThemeSwitcherSection() {
+	<div class="card bg-base-200 mb-6">
+		<div class="card-body">
+			<h2 class="card-title">Theme Switcher</h2>
+			<p class="text-sm mb-4">DaisyUI supports multiple themes. Try switching!</p>
+			<div class="flex flex-wrap gap-2">
+				<input type="radio" name="theme" class="btn theme-controller" aria-label="Light" value="light" checked/>
+				<input type="radio" name="theme" class="btn theme-controller" aria-label="Dark" value="dark"/>
+				<input type="radio" name="theme" class="btn theme-controller" aria-label="Cupcake" value="cupcake"/>
+				<input type="radio" name="theme" class="btn theme-controller" aria-label="Forest" value="forest"/>
+				<input type="radio" name="theme" class="btn theme-controller" aria-label="Synthwave" value="synthwave"/>
+			</div>
+		</div>
+	</div>
+}
+
+// ComponentShowcaseSection shows various DaisyUI components
+templ ComponentShowcaseSection() {
+	<div class="card bg-base-200 mb-6">
+		<div class="card-body">
+			<h2 class="card-title">DaisyUI Components</h2>
+			<p class="text-sm mb-4">A few examples of DaisyUI components.</p>
+			<div class="flex flex-wrap gap-4 mb-4">
+				<button class="btn">Default</button>
+				<button class="btn btn-primary">Primary</button>
+				<button class="btn btn-secondary">Secondary</button>
+				<button class="btn btn-accent">Accent</button>
+				<button class="btn btn-ghost">Ghost</button>
+				<button class="btn btn-outline">Outline</button>
+			</div>
+			<div class="flex flex-wrap gap-2 mb-4">
+				<span class="badge">Default</span>
+				<span class="badge badge-primary">Primary</span>
+				<span class="badge badge-secondary">Secondary</span>
+				<span class="badge badge-accent">Accent</span>
+				<span class="badge badge-info">Info</span>
+				<span class="badge badge-success">Success</span>
+				<span class="badge badge-warning">Warning</span>
+				<span class="badge badge-error">Error</span>
+			</div>
+			<div class="flex flex-wrap gap-2">
+				<div class="tooltip" data-tip="Hello!">
+					<button class="btn">Hover me</button>
+				</div>
+				<label class="swap swap-flip">
+					<input type="checkbox"/>
+					<div class="swap-on">ON</div>
+					<div class="swap-off">OFF</div>
+				</label>
+				<input type="checkbox" class="toggle toggle-primary"/>
+				<input type="checkbox" class="checkbox checkbox-primary"/>
+			</div>
+		</div>
+	</div>
+}

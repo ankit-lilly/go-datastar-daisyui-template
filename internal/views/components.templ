@@ -1,0 +1,53 @@
+package views
+
+// Base layout component that wraps all pages
+templ Base(title string) {
+	<!DOCTYPE html>
+	<html lang="en" data-theme="light">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+			<title>{ title }</title>
+			<link rel="stylesheet" href="/static/css/output.css"/>
+			<script type="module" src="/static/js/datastar.js"></script>
+		</head>
+		<body class="min-h-screen">
+			{ children... }
+		</body>
+	</html>
+}
+
+// Navbar component for consistent navigation
+templ Navbar(activePage string) {
+	<div class="navbar bg-base-200">
+		<div class="navbar-start">
+			<a href="/" class="btn btn-ghost text-xl">Go Template</a>
+		</div>
+		<div class="navbar-end">
+			if activePage == "home" {
+				<a href="/demo" class="btn btn-primary btn-sm">Demo</a>
+			} else {
+				<a href="/" class="btn btn-ghost btn-sm">Home</a>
+			}
+		</div>
+	</div>
+}
+
+// Footer component
+templ Footer() {
+	<footer class="footer footer-center p-4 bg-base-200">
+		<aside>
+			<p>Built with Go, Templ, Datastar, DaisyUI, and Tailwind CSS</p>
+		</aside>
+	</footer>
+}
+
+// Card component for feature cards
+templ Card(title, description string) {
+	<div class="card bg-base-200">
+		<div class="card-body">
+			<h2 class="card-title justify-center">{ title }</h2>
+			<p class="text-sm">{ description }</p>
+		</div>
+	</div>
+}

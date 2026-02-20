@@ -1,0 +1,29 @@
+# Binaries
+bin/
+
+# Generated CSS
+static/css/output.css
+static/css/tailwindcss
+static/css/daisyui.mjs
+static/css/daisyui-theme.mjs
+static/css/input.css
+
+# Generated JS
+static/js/datastar.js
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+
+# Test artifacts
+coverage.out
