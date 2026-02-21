@@ -1,4 +1,4 @@
-.PHONY: setup install build run dev clean templ
+.PHONY: setup install build run dev clean templ fmt
 
 # Install downloads all dependencies using Go install script
 install:
@@ -10,6 +10,10 @@ setup: install
 # Generate templ files (using go tool directive)
 templ:
 	@go tool templ generate
+
+# Format Go source files
+fmt:
+	@find . -type f -name '*.go' -not -path './vendor/*' -exec gofmt -w {} +
 
 # Build the Go binary (generates templ first)
 build: templ
@@ -62,6 +66,7 @@ help:
 	@echo "  install    - Download Tailwind CSS, DaisyUI, Datastar and setup templ"
 	@echo "  setup      - Alias for install"
 	@echo "  templ      - Generate Go code from templ files"
+	@echo "  fmt        - Format Go source files"
 	@echo "  build      - Generate templ and build the Go binary"
 	@echo "  run        - Build and run the server"
 	@echo "  dev        - Run in development mode with templ and CSS watchers"

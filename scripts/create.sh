@@ -198,9 +198,13 @@ main() {
     print_step "Downloading template..."
     curl -fsSL "$TARBALL_URL" | tar -xz -C "$tmp_dir"
 
-    # Find extracted directory (it includes the branch name)
-    local extracted_dir=$(ls "$tmp_dir")
-    local template_dir="$tmp_dir/$extracted_dir"
+    # Find extracted directory (tarball root folder)
+    local template_dir
+    template_dir="$(find "$tmp_dir" -mindepth 1 -maxdepth 1 -type d | head -n 1)"
+    if [ -z "$template_dir" ] || [ ! -d "$template_dir" ]; then
+        print_error "Failed to locate extracted template directory"
+        exit 1
+    fi
 
     # Create project directory
     print_step "Creating project directory..."
@@ -210,6 +214,7 @@ main() {
     print_step "Copying files..."
     rsync -a \
         --exclude='bin/' \
+        --exclude='/scripts/' \
         --exclude='static/css/tailwindcss' \
         --exclude='static/css/daisyui*.mjs' \
         --exclude='static/css/input.css' \
@@ -222,6 +227,12 @@ main() {
         --exclude='go.sum' \
         --exclude='.git/' \
         "$template_dir/" "$project_dir/"
+
+    # Sanity check: ensure core scaffold files were copied
+    if [ ! -f "$project_dir/go.mod" ] || [ ! -f "$project_dir/cmd/server/main.go" ]; then
+        print_error "Template copy incomplete (missing Go scaffold files)"
+        exit 1
+    fi
 
     # Update module name
     print_step "Updating module name..."

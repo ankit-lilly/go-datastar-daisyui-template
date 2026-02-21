@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -9,6 +10,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"sync"
 )
 
 const (
@@ -37,26 +39,47 @@ func main() {
 
 	fmt.Printf("🚀 Setting up Go + Templ + Datastar + DaisyUI template for %s/%s\n\n", runtime.GOOS, runtime.GOARCH)
 
-	// Download Go dependencies (including templ tool)
-	downloadDeps()
-
-	// Download Tailwind CSS (latest)
-	downloadTailwind(cssDir)
-
-	// Download DaisyUI (latest)
-	downloadDaisyUI(cssDir)
-
-	// Download Datastar (latest)
-	downloadDatastar(jsDir)
-
-	// Create input.css
-	createInputCSS(cssDir)
+	// Run independent setup tasks concurrently to reduce total install time.
+	if err := runParallel(
+		task{
+			name: "go dependencies",
+			fn:   downloadDeps,
+		},
+		task{
+			name: "tailwind",
+			fn: func() error {
+				return downloadTailwind(cssDir)
+			},
+		},
+		task{
+			name: "daisyui",
+			fn: func() error {
+				return downloadDaisyUI(cssDir)
+			},
+		},
+		task{
+			name: "datastar",
+			fn: func() error {
+				return downloadDatastar(jsDir)
+			},
+		},
+		task{
+			name: "input.css",
+			fn: func() error {
+				return createInputCSS(cssDir)
+			},
+		},
+	); err != nil {
+		fatal("Setup failed: %v", err)
+	}
 
 	// Generate templ files
 	generateTempl()
 
 	// Build CSS
-	buildCSS(cssDir)
+	if err := buildCSS(cssDir); err != nil {
+		fatal("Failed to build CSS: %v", err)
+	}
 
 	fmt.Println("\n✅ Setup complete!")
 	fmt.Println("\nFiles created:")
@@ -72,19 +95,20 @@ func main() {
 	fmt.Println("  make dev     - Run in development mode with watchers")
 }
 
-func downloadDeps() {
+func downloadDeps() error {
 	fmt.Println("  📦 Downloading Go dependencies...")
 
 	cmd := exec.Command("go", "mod", "tidy")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	if err := cmd.Run(); err != nil {
-		fatal("Failed to download dependencies: %v", err)
+		return err
 	}
 	fmt.Println("  ✅ Go dependencies ready (templ available via 'go tool templ')")
+	return nil
 }
 
-func downloadTailwind(cssDir string) {
+func downloadTailwind(cssDir string) error {
 	fmt.Println("  📦 Downloading Tailwind CSS (latest)...")
 
 	filename := buildTailwindFilename()
@@ -92,48 +116,58 @@ func downloadTailwind(cssDir string) {
 	destPath := filepath.Join(cssDir, "tailwindcss")
 
 	if err := downloadFile(url, destPath); err != nil {
-		fatal("Failed to download Tailwind CSS: %v", err)
+		return err
 	}
 
 	if err := os.Chmod(destPath, 0755); err != nil {
-		fatal("Failed to make Tailwind executable: %v", err)
+		return err
 	}
 
 	fmt.Println("  ✅ Tailwind CSS downloaded")
+	return nil
 }
 
-func downloadDaisyUI(cssDir string) {
+func downloadDaisyUI(cssDir string) error {
 	fmt.Println("  📦 Downloading DaisyUI (latest)...")
 
-	// Download daisyui.mjs
-	url := fmt.Sprintf("%s/daisyui.mjs", daisyUIBaseURL)
-	destPath := filepath.Join(cssDir, "daisyui.mjs")
-	if err := downloadFile(url, destPath); err != nil {
-		fatal("Failed to download daisyui.mjs: %v", err)
-	}
-
-	// Download daisyui-theme.mjs
-	url = fmt.Sprintf("%s/daisyui-theme.mjs", daisyUIBaseURL)
-	destPath = filepath.Join(cssDir, "daisyui-theme.mjs")
-	if err := downloadFile(url, destPath); err != nil {
-		fatal("Failed to download daisyui-theme.mjs: %v", err)
+	if err := runParallel(
+		task{
+			name: "daisyui.mjs",
+			fn: func() error {
+				url := fmt.Sprintf("%s/daisyui.mjs", daisyUIBaseURL)
+				destPath := filepath.Join(cssDir, "daisyui.mjs")
+				return downloadFile(url, destPath)
+			},
+		},
+		task{
+			name: "daisyui-theme.mjs",
+			fn: func() error {
+				url := fmt.Sprintf("%s/daisyui-theme.mjs", daisyUIBaseURL)
+				destPath := filepath.Join(cssDir, "daisyui-theme.mjs")
+				return downloadFile(url, destPath)
+			},
+		},
+	); err != nil {
+		return err
 	}
 
 	fmt.Println("  ✅ DaisyUI downloaded")
+	return nil
 }
 
-func downloadDatastar(jsDir string) {
+func downloadDatastar(jsDir string) error {
 	fmt.Println("  📦 Downloading Datastar v" + datastarVersion + "...")
 
 	destPath := filepath.Join(jsDir, "datastar.js")
 	if err := downloadFile(datastarURL, destPath); err != nil {
-		fatal("Failed to download Datastar: %v", err)
+		return err
 	}
 
 	fmt.Println("  ✅ Datastar v" + datastarVersion + " downloaded")
+	return nil
 }
 
-func createInputCSS(cssDir string) {
+func createInputCSS(cssDir string) error {
 	content := `@import "tailwindcss";
 
 @source "../../internal/views/**/*.templ";
@@ -144,9 +178,10 @@ func createInputCSS(cssDir string) {
 
 	destPath := filepath.Join(cssDir, "input.css")
 	if err := os.WriteFile(destPath, []byte(content), 0644); err != nil {
-		fatal("Failed to create input.css: %v", err)
+		return err
 	}
 	fmt.Println("  ✅ Created input.css")
+	return nil
 }
 
 func generateTempl() {
@@ -162,7 +197,7 @@ func generateTempl() {
 	fmt.Println("  ✅ templ files generated")
 }
 
-func buildCSS(cssDir string) {
+func buildCSS(cssDir string) error {
 	fmt.Println("  🔨 Building CSS...")
 
 	// Run from cssDir, so use relative paths
@@ -171,9 +206,10 @@ func buildCSS(cssDir string) {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	if err := cmd.Run(); err != nil {
-		fatal("Failed to build CSS: %v", err)
+		return err
 	}
 	fmt.Println("  ✅ CSS built")
+	return nil
 }
 
 func downloadFile(url, destPath string) error {
@@ -236,4 +272,35 @@ func isMusl() bool {
 func fatal(format string, args ...any) {
 	fmt.Fprintf(os.Stderr, "❌ "+format+"\n", args...)
 	os.Exit(1)
+}
+
+type task struct {
+	name string
+	fn   func() error
+}
+
+func runParallel(tasks ...task) error {
+	var wg sync.WaitGroup
+	errCh := make(chan error, len(tasks))
+
+	for _, t := range tasks {
+		t := t
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			if err := t.fn(); err != nil {
+				errCh <- fmt.Errorf("%s: %w", t.name, err)
+			}
+		}()
+	}
+
+	wg.Wait()
+	close(errCh)
+
+	var errs []error
+	for err := range errCh {
+		errs = append(errs, err)
+	}
+
+	return errors.Join(errs...)
 }

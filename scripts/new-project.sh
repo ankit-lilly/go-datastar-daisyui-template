@@ -36,6 +36,7 @@ mkdir -p "$PROJECT_PATH"
 rsync -a \
     --exclude='.git' \
     --exclude='bin/' \
+    --exclude='/scripts/' \
     --exclude='static/css/tailwindcss' \
     --exclude='static/css/daisyui*.mjs' \
     --exclude='static/css/input.css' \
@@ -47,6 +48,12 @@ rsync -a \
     --exclude='llms.md' \
     --exclude='go.sum' \
     "$TEMPLATE_DIR/" "$PROJECT_PATH/"
+
+# Sanity check: ensure core scaffold files were copied
+if [ ! -f "$PROJECT_PATH/go.mod" ] || [ ! -f "$PROJECT_PATH/cmd/server/main.go" ]; then
+    echo "❌ Error: Template copy incomplete (missing Go scaffold files)"
+    exit 1
+fi
 
 # Update module name in go.mod
 echo "  📝 Updating go.mod..."

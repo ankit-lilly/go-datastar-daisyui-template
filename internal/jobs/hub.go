@@ -28,11 +28,11 @@ type Job struct {
 	CreatedAt time.Time
 	Error     error
 
-	ctx      context.Context
-	cancel   context.CancelFunc
-	work     JobFunc
-	updates  chan JobUpdate
-	mu       sync.RWMutex
+	ctx     context.Context
+	cancel  context.CancelFunc
+	work    JobFunc
+	updates chan JobUpdate
+	mu      sync.RWMutex
 }
 
 // NewJob creates a new job
