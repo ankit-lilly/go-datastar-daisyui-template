@@ -2,7 +2,6 @@ package views
 
 import "fmt"
 
-// IndexPage renders the home page (demo page)
 templ IndexPage() {
 	@Base("Go + Templ + Datastar + DaisyUI") {
 		@Navbar()
@@ -23,7 +22,6 @@ templ IndexPage() {
 	}
 }
 
-// CounterSection shows the SSE counter example
 templ CounterSection() {
 	<div class="card bg-base-200 mb-6">
 		<div class="card-body">
@@ -44,12 +42,10 @@ templ CounterSection() {
 	</div>
 }
 
-// CounterValue renders just the counter value span (for SSE updates)
 templ CounterValue(count int64) {
 	<span id="counter-value">{ fmt.Sprintf("%d", count) }</span>
 }
 
-// FormBindingSection shows reactive form binding
 templ FormBindingSection() {
 	<div class="card bg-base-200 mb-6">
 		<div class="card-body">
@@ -89,7 +85,6 @@ templ FormBindingSection() {
 	</div>
 }
 
-// BackgroundJobSection shows background job with progress
 templ BackgroundJobSection() {
 	<div class="card bg-base-200 mb-6">
 		<div class="card-body">
@@ -114,14 +109,12 @@ templ BackgroundJobSection() {
 	</div>
 }
 
-// JobInfo renders job info alert (for SSE updates)
 templ JobInfo(jobID string, alertClass string, message string) {
 	<div id="job-info" class={ "alert " + alertClass }>
 		<span>{ message }</span>
 	</div>
 }
 
-// ThemeSwitcherSection shows DaisyUI theme switching
 templ ThemeSwitcherSection() {
 	<div class="card bg-base-200 mb-6">
 		<div class="card-body">
@@ -138,7 +131,6 @@ templ ThemeSwitcherSection() {
 	</div>
 }
 
-// ComponentShowcaseSection shows various DaisyUI components
 templ ComponentShowcaseSection() {
 	<div class="card bg-base-200 mb-6">
 		<div class="card-body">

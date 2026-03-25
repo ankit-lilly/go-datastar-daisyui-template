@@ -1,29 +1,22 @@
 .PHONY: setup install build run dev clean templ fmt
 
-# Install downloads all dependencies using Go install script
 install:
 	@go run ./cmd/install
 
-# Setup is an alias for install (backwards compatibility)
 setup: install
 
-# Generate templ files (using go tool directive)
 templ:
 	@go tool templ generate
 
-# Format Go source files
 fmt:
 	@find . -type f -name '*.go' -not -path './vendor/*' -exec gofmt -w {} +
 
-# Build the Go binary (generates templ first)
 build: templ
 	@go build -o bin/server ./cmd/server
 
-# Run the server
 run: build
 	@./bin/server
 
-# Development mode: watch templ, CSS and run server
 dev:
 	@if [ ! -f static/css/tailwindcss ]; then \
 		echo "Run 'make install' first to download dependencies"; \
@@ -34,17 +27,14 @@ dev:
 	@cd static/css && ./tailwindcss -i input.css -o output.css --watch &
 	@sleep 1 && go run ./cmd/server
 
-# Rebuild CSS only
 css:
 	@cd static/css && ./tailwindcss -i input.css -o output.css --minify
 
-# Clean build artifacts
 clean:
 	@rm -rf bin/
 	@rm -f static/css/output.css
 	@rm -f internal/views/*_templ.go
 
-# Clean everything including downloaded files
 clean-all: clean
 	@rm -f static/css/tailwindcss
 	@rm -f static/css/daisyui.mjs
@@ -52,15 +42,12 @@ clean-all: clean
 	@rm -f static/css/input.css
 	@rm -f static/js/datastar.js
 
-# Download Go dependencies
 deps:
 	@go mod tidy
 
-# Run tests
 test:
 	@go test -v ./...
 
-# Help
 help:
 	@echo "Available targets:"
 	@echo "  install    - Download Tailwind CSS, DaisyUI, Datastar and setup templ"

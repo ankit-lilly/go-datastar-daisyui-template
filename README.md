@@ -2,14 +2,9 @@
 
 A modern, server-rendered Go web application template featuring:
 
-- **Go 1.24+** with new HTTP handler patterns and `go tool` directive
-- **Templ** for type-safe, compiled HTML templates
-- **Structured logging** with `log/slog`
-- **Graceful shutdown** handling
 - **Datastar** for reactive frontend without npm
 - **DaisyUI 5** for beautiful UI components (always latest version)
 - **Tailwind CSS 4** (standalone binary, no Node.js required)
-- **Background job hub** for long-running tasks with SSE progress updates
 
 ## Create a New Project
 

@@ -16,44 +16,35 @@ import (
 )
 
 func main() {
-	// Initialize structured logger
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
 		Level: slog.LevelInfo,
 	}))
 	slog.SetDefault(logger)
 
-	// Load configuration
 	cfg := config.Load()
 
-	// Initialize job hub for background tasks
 	jobHub := jobs.NewHub(logger)
 	go jobHub.Run()
 
-	// Setup routes
 	mux := http.NewServeMux()
 	h := handlers.New(logger, jobHub)
 
-	// Static files
 	mux.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
-	// Pages
 	mux.HandleFunc("GET /", h.Index)
 
-	// API - SSE endpoints
 	mux.HandleFunc("GET /api/counter", h.Counter)
 	mux.HandleFunc("POST /api/increment", h.Increment)
 	mux.HandleFunc("POST /api/job/start", h.StartJob)
 
-	// Create server
 	server := &http.Server{
 		Addr:         cfg.Addr,
 		Handler:      logRequests(logger, mux),
 		ReadTimeout:  15 * time.Second,
-		WriteTimeout: 0, // Disabled for SSE
+		WriteTimeout: 0,
 		IdleTimeout:  60 * time.Second,
 	}
 
-	// Start server in goroutine
 	go func() {
 		logger.Info("server starting", "addr", cfg.Addr)
 		if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
@@ -69,11 +60,9 @@ func main() {
 
 	logger.Info("shutting down server...")
 
-	// Graceful shutdown with timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	// Stop job hub
 	jobHub.Stop()
 
 	if err := server.Shutdown(ctx); err != nil {

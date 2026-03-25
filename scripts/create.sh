@@ -120,6 +120,70 @@ prompt_yn() {
     [[ "$input" =~ ^[Yy]$ ]]
 }
 
+patch_generated_makefile() {
+    local file="$1"
+    [ -f "$file" ] || return 0
+
+    local tmp_file
+    tmp_file="$(mktemp)"
+
+    awk '
+    BEGIN { skip_install = 0 }
+    /^install:$/ { skip_install = 1; next }
+    skip_install == 1 {
+        if ($0 ~ /^[^[:space:]].*:/) {
+            skip_install = 0
+        } else {
+            next
+        }
+    }
+    /^setup: install$/ { next }
+    /^\t@echo "  install/ { next }
+    /^\t@echo "  setup/ { next }
+    /Run '\''make install'\'' first to download dependencies/ {
+        print "\t\techo \"Frontend assets are missing in static/css\"; \\"
+        next
+    }
+    /^\.PHONY:/ {
+        print ".PHONY: build run dev clean templ fmt css deps test help clean-all"
+        next
+    }
+    { print }
+    ' "$file" > "$tmp_file"
+
+    mv "$tmp_file" "$file"
+}
+
+patch_generated_readme() {
+    local file="$1"
+    [ -f "$file" ] || return 0
+
+    local tmp_file
+    tmp_file="$(mktemp)"
+
+    awk '
+    /│   └── install\// { next }
+    /│       └── main.go[[:space:]]+# Install script/ { next }
+    /^The install script/ {
+        print "During project creation, the template downloads:"
+        next
+    }
+    /^make install/ { next }
+    /go run \.\/cmd\/install/ { next }
+    /^make setup/ { next }
+    /install[[:space:]]+# Download Tailwind/ { next }
+    /setup[[:space:]]+# Alias for install/ { next }
+    /├── scripts\// { next }
+    /│   ├── create\.sh/ { next }
+    /│   ├── setup\.sh/ { next }
+    /│   └── new-project\.sh/ { next }
+    /^# Install dependencies and run$/ { print "# Run"; next }
+    { print }
+    ' "$file" > "$tmp_file"
+
+    mv "$tmp_file" "$file"
+}
+
 # Main
 main() {
     print_banner
@@ -215,6 +279,7 @@ main() {
     rsync -a \
         --exclude='bin/' \
         --exclude='/scripts/' \
+        --exclude='cmd/install/' \
         --exclude='static/css/tailwindcss' \
         --exclude='static/css/daisyui*.mjs' \
         --exclude='static/css/input.css' \
@@ -248,6 +313,10 @@ main() {
         find "$project_dir" -type f -name "*.templ" -exec sed -i "s|$OLD_MODULE|$module_name|g" {} \;
     fi
 
+    # Remove template-only install workflow from generated project docs/build file
+    patch_generated_makefile "$project_dir/Makefile"
+    patch_generated_readme "$project_dir/README.md"
+
     # Create directories
     mkdir -p "$project_dir/static/css" "$project_dir/static/js" "$project_dir/bin"
 
@@ -256,17 +325,9 @@ main() {
     cd "$project_dir"
     git init -q
 
-    # Generate templ files first (needed before go mod tidy)
-    print_step "Generating templ files..."
-    go run github.com/a-h/templ/cmd/templ@latest generate
-
-    # Download dependencies
-    print_step "Downloading Go dependencies..."
-    go mod tidy
-
-    # Run install
+    # Run setup using template setup script
     print_step "Installing frontend dependencies (Tailwind, DaisyUI, Datastar)..."
-    go run ./cmd/install
+    bash "$template_dir/scripts/setup.sh" "static"
 
     echo ""
     echo -e "${GREEN}═══════════════════════════════════════════════════════════${NC}"

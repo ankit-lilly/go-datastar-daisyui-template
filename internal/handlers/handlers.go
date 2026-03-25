@@ -28,7 +28,6 @@ func New(logger *slog.Logger, jobHub *jobs.Hub) *Handlers {
 	}
 }
 
-// Index serves the main page
 func (h *Handlers) Index(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		http.NotFound(w, r)
@@ -41,17 +40,14 @@ func (h *Handlers) Index(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Counter handles SSE streaming for counter updates
 func (h *Handlers) Counter(w http.ResponseWriter, r *http.Request) {
 	sse := datastar.NewSSE(w, r)
 
-	// Send initial counter value using templ component
 	count := h.counter.Load()
 	html := renderComponent(r.Context(), views.CounterValue(count))
 	sse.PatchElements(html)
 }
 
-// Increment handles counter increment via POST
 func (h *Handlers) Increment(w http.ResponseWriter, r *http.Request) {
 	sse := datastar.NewSSE(w, r)
 
@@ -60,13 +56,10 @@ func (h *Handlers) Increment(w http.ResponseWriter, r *http.Request) {
 	sse.PatchElements(html)
 }
 
-// StartJob starts a background job and streams progress
 func (h *Handlers) StartJob(w http.ResponseWriter, r *http.Request) {
 	sse := datastar.NewSSE(w, r)
 
-	// Create a new job
 	job := h.jobHub.NewJob("demo-task", func(j *jobs.Job) error {
-		// Simulate long-running work
 		for i := 0; i <= 100; i += 10 {
 			select {
 			case <-j.Context().Done():
@@ -79,15 +72,12 @@ func (h *Handlers) StartJob(w http.ResponseWriter, r *http.Request) {
 		return nil
 	})
 
-	// Submit job to hub
 	h.jobHub.Submit(job)
 
-	// Send initial state
 	sse.PatchSignals([]byte(fmt.Sprintf(`{"jobId": "%s", "jobStatus": "running", "jobProgress": 0}`, job.ID)))
 	html := renderComponent(r.Context(), views.JobInfo(job.ID, "alert-info", "Job started"))
 	sse.PatchElements(html)
 
-	// Stream job progress
 	for update := range job.Updates() {
 		sse.PatchSignals([]byte(fmt.Sprintf(`{"jobProgress": %d}`, update.Progress)))
 
@@ -108,7 +98,6 @@ func (h *Handlers) StartJob(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// renderComponent renders a templ component to a string
 func renderComponent(ctx context.Context, component templ.Component) string {
 	var buf bytes.Buffer
 	if err := component.Render(ctx, &buf); err != nil {
