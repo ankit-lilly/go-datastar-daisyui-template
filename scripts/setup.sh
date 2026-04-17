@@ -22,7 +22,7 @@ JS_DIR="$STATIC_DIR/js"
 
 TAILWIND_BASE_URL="https://github.com/tailwindlabs/tailwindcss/releases/latest/download"
 DAISYUI_BASE_URL="https://github.com/saadeghi/daisyui/releases/latest/download"
-DATASTAR_VERSION="1.0.0-RC.7"
+DATASTAR_VERSION="v1.0.0"
 DATASTAR_URL="https://cdn.jsdelivr.net/gh/starfederation/datastar@${DATASTAR_VERSION}/bundles/datastar.js"
 
 INPUT_CSS_CONTENT='@import "tailwindcss";

@@ -16,7 +16,7 @@ import (
 const (
 	tailwindBaseURL = "https://github.com/tailwindlabs/tailwindcss/releases/latest/download"
 	daisyUIBaseURL  = "https://github.com/saadeghi/daisyui/releases/latest/download"
-	datastarVersion = "1.0.0-RC.7"
+	datastarVersion = "v1.0.0"
 	datastarURL     = "https://cdn.jsdelivr.net/gh/starfederation/datastar@" + datastarVersion + "/bundles/datastar.js"
 )
 
