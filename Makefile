@@ -5,7 +5,7 @@ install:
 
 setup: install
 
-templ:
+templ: css
 	@go tool templ generate
 
 fmt:

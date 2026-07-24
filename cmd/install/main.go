@@ -16,7 +16,7 @@ import (
 const (
 	tailwindBaseURL = "https://github.com/tailwindlabs/tailwindcss/releases/latest/download"
 	daisyUIBaseURL  = "https://github.com/saadeghi/daisyui/releases/latest/download"
-	datastarVersion = "1.0.0-RC.7"
+	datastarVersion = "v1.0.2"
 	datastarURL     = "https://cdn.jsdelivr.net/gh/starfederation/datastar@" + datastarVersion + "/bundles/datastar.js"
 )
 
@@ -284,14 +284,11 @@ func runParallel(tasks ...task) error {
 	errCh := make(chan error, len(tasks))
 
 	for _, t := range tasks {
-		t := t
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			if err := t.fn(); err != nil {
 				errCh <- fmt.Errorf("%s: %w", t.name, err)
 			}
-		}()
+		})
 	}
 
 	wg.Wait()

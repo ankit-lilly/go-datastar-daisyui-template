@@ -26,7 +26,7 @@ templ CounterSection() {
 	<div class="card bg-base-200 mb-6">
 		<div class="card-body">
 			<h2 class="card-title">Counter with SSE</h2>
-			<p class="text-sm mb-4">Click to increment the counter. Updates are pushed via Server-Sent Events.</p>
+			<p class="text-sm mb-4">Click to increment the counter. Updates are pushed via Server-Sent Events. The state is maintained on server</p>
 			<div class="flex items-center gap-4" data-init="@get('/api/counter')">
 				<button
 					class="btn btn-primary"

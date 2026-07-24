@@ -149,12 +149,19 @@ make clean-all  # Remove all generated files
 
 The install script (`make install` or `go run ./cmd/install`) downloads:
 
-| Dependency | Source | Purpose |
-|------------|--------|---------|
-| Tailwind CSS | GitHub releases (latest) | CSS utility framework (standalone binary) |
-| DaisyUI | GitHub releases (latest) | UI component library (CSS plugin) |
-| Datastar | jsDelivr CDN (latest) | Reactive frontend via SSE |
-| Templ | go.mod tool directive | Type-safe HTML templates |
+┌─────────────┬──────────────────────────┬─────────────────────────────┐
+│  Dependency │          Source          │             Purpose         │
+├─────────────┼──────────────────────────┼─────────────────────────────┤
+│ Tailwind CSS│ GitHub releases (latest) │  CSS utility framework      │
+│             │                          │ (standalone binary)         │
+├─────────────┼──────────────────────────┼─────────────────────────────┤
+│ DaisyUI     │ GitHub releases (latest) │  UI component library (CSS  │
+│             │                          │ plugin)                     │
+├─────────────┼──────────────────────────┼─────────────────────────────┤
+│ Datastar    │ jsDelivr CDN (latest)    │  Reactive frontend via SSE  │
+├─────────────┼──────────────────────────┼─────────────────────────────┤
+│ Templ       │ go.mod tool directive    │  Type-safe HTML templates   │
+└─────────────┴──────────────────────────┴─────────────────────────────┘
 
 ### Templ (via `go tool`)
 
@@ -299,10 +306,13 @@ for update := range job.Updates() {
 
 Environment variables:
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `ADDR`   | `:8080` | Server address |
-| `ENV`    | `development` | Environment name |
+┌───────────┬─────────────────┬────────────────────┐
+│ Variable  │     Default     │    Description     │
+├───────────┼─────────────────┼────────────────────┤
+│ `ADDR`    │  `:8080`        │  Server address    │
+├───────────┼─────────────────┼────────────────────┤
+│ `ENV`     │  `development`  │  Environment name  │
+└───────────┴─────────────────┴────────────────────┘
 
 ## License
 
