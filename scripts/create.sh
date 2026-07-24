@@ -285,7 +285,6 @@ main() {
         --exclude='static/css/input.css' \
         --exclude='static/css/output.css' \
         --exclude='static/js/datastar.js' \
-        --exclude='internal/views/*_templ.go' \
         --exclude='docs/' \
         --exclude='daisuidocs.txt' \
         --exclude='llms.md' \
